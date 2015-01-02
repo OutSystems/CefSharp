@@ -59,7 +59,8 @@ namespace CefSharp
     internal:
         static IDictionary<String^, Object^>^ GetBoundObjects()
         {
-            return _boundObjects;
+			msclr::lock l(_boundObjects);
+            return gcnew Dictionary<String^, Object^>(_boundObjects);
         }
 
     public:
@@ -129,6 +130,7 @@ namespace CefSharp
 
         static bool RegisterJsObject(String^ name, Object^ objectToBind)
         {
+			msclr::lock l(_boundObjects);
             _boundObjects[name] = objectToBind;
             return true;
         }

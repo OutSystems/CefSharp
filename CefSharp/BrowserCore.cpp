@@ -1,5 +1,6 @@
 #include "Stdafx.h"
 
+#include <msclr/lock.h>
 #include "BrowserCore.h"
 
 namespace CefSharp
@@ -14,12 +15,14 @@ namespace CefSharp
 
     void BrowserCore::RegisterJsObject(String^ name, Object^ objectToBind)
     {
+		msclr::lock l(_boundObjects);
         _boundObjects[name] = objectToBind;
     }
 
     IDictionary<String^, Object^>^ BrowserCore::GetBoundObjects()
     {
-        return _boundObjects;
+		msclr::lock l(_boundObjects);
+        return gcnew Dictionary<String^, Object^>(_boundObjects);
     }
 
     void BrowserCore::SetNavState(bool isLoading, bool canGoBack, bool canGoForward)
