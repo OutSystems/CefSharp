@@ -65,9 +65,9 @@ If your new to `CefSharp` and are downloading the source to check it out, please
 
 | Branch | CEF Version | VC++ Version | .Net Version | Status |
 |--------|-------------|--------------|--------------|--------|
-| [master](https://github.com/cefsharp/CefSharp/) | 2883 | 2013 | 4.5.2 | Development |
-| [cefsharp/57](https://github.com/cefsharp/CefSharp/tree/cefsharp/57) | 2987 | 2013 | 4.5.2 | **Pre-Release** |
-| [cefsharp/55](https://github.com/cefsharp/CefSharp/tree/cefsharp/55) | 2883 | 2013 | 4.5.2 | **Release** |
+| [master](https://github.com/cefsharp/CefSharp/) | 2987 | 2013 | 4.5.2 | Development |
+| [cefsharp/57](https://github.com/cefsharp/CefSharp/tree/cefsharp/57) | 2987 | 2013 | 4.5.2 | **Release** |
+| [cefsharp/55](https://github.com/cefsharp/CefSharp/tree/cefsharp/55) | 2883 | 2013 | 4.5.2 | Unsupported |
 | [cefsharp/53](https://github.com/cefsharp/CefSharp/tree/cefsharp/53) | 2785 | 2013 | 4.5.2 | Unsupported |
 | [cefsharp/51](https://github.com/cefsharp/CefSharp/tree/cefsharp/51) | 2704 | 2013 | 4.5.2 | Unsupported |
 | [cefsharp/49](https://github.com/cefsharp/CefSharp/tree/cefsharp/49) | 2623 | 2013 | 4.0   | Unsupported |
@@ -89,6 +89,6 @@ Creating regular releases of CefSharp is a time intensive process and so to supp
 - [CefGlue](https://bitbucket.org/xilium/xilium.cefglue/): An alternative .NET CEF wrapper built using P/Invoke.
 - [ChromiumFx](https://bitbucket.org/chromiumfx/chromiumfx) : Another P/Invoke .Net CEF wrapper
 - [CEF Forum](http://magpcss.org/ceforum/) : The official CEF Forum
-- [CEF API Docs] (http://magpcss.org/ceforum/apidocs3/index-all.html) : Well worth a read if you are implementing a new feature
-- [HtmlView] (https://github.com/MISoftware/HtmlView) : Visual Studio extension bringing CefSharp for showing HTML pages inside VS.
+- [CEF API Docs](http://magpcss.org/ceforum/apidocs3/index-all.html) : Well worth a read if you are implementing a new feature
+- [HtmlView](https://github.com/MISoftware/HtmlView) : Visual Studio extension bringing CefSharp for showing HTML pages inside VS.
 
