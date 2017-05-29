@@ -1904,6 +1904,10 @@ namespace CefSharp.Wpf
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:PreviewTextInput" /> event.
+        /// </summary>
+        /// <param name="e">The <see cref="TextCompositionEventArgs"/> instance containing the event data.</param>
         protected override void OnPreviewTextInput(TextCompositionEventArgs e) 
         {
             if (browser != null) {
