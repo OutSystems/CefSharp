@@ -38,7 +38,7 @@
                         Name="goStopButton"
                         Width="75"
                         DockPanel.Dock="Right"
-                        Command="{Binding GoCommand}">Go</Button>
+                        Command="{Binding GoCommand}" Content="_Go"></Button>
                 <TextBox Height="23"
                          Text="{Binding AddressEditable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotKeyboardFocus="OnTextBoxGotKeyboardFocus"
