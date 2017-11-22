@@ -94,17 +94,14 @@ namespace CefSharp.ModelBinding
                 {
                     var val = GetValue(bindingContext, i);
 
-                    if (val != null)
+                    if (val != null && val.GetType().IsGenericObject())
                     {
-                        if (val.GetType().IsGenericObject())
-                        {
-                            var subModel = Bind(val, genericType);
-                            model.Add(subModel);
-                        }
-                        else
-                        { 
-                            model.Add(val);
-                        }
+                        var subModel = Bind(val, genericType);
+                        model.Add(subModel);
+                    }
+                    else
+                    { 
+                        model.Add(val);
                     }
                 }
             }
