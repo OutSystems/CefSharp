@@ -19,7 +19,7 @@ namespace CefSharp.Example.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -318,11 +318,10 @@ namespace CefSharp.Example.Properties {
         ///        &lt;div id=&quot;qunit-fixture&quot;&gt;&lt;/div&gt;
         ///        &lt;script src=&quot;https://code.jquery.com/qunit/qunit-2.4.1.js&quot;&gt;&lt;/script&gt;
         ///
-        ///        &lt;!--&lt;script type=&quot;text/javascript&quot;&gt;
-        ///        (async function() {
-        ///            // &lt;embed user provided code here&gt;
-        ///
-        ///     [rest of string was truncated]&quot;;.
+        ///        &lt;script type=&quot;text/javascript&quot;&gt;
+        ///        (async () =&gt;
+        ///        {
+        ///            await CefSharp.BindObjectAsync(&quot;boundAsync [rest of string was truncated]&quot;;.
         /// </summary>
         public static string BindingTestSingle {
             get {
@@ -421,6 +420,34 @@ namespace CefSharp.Example.Properties {
         public static string CssAnimation {
             get {
                 return ResourceManager.GetString("CssAnimation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;&gt;
+        ///&lt;html&gt;
+        ///&lt;head&gt;
+        ///    &lt;title&gt;Drag&amp;Drop Cursors Test&lt;/title&gt;
+        ///    &lt;style&gt;
+        ///        .dropzone {
+        ///            width: 80px;
+        ///            height: 70px;
+        ///            padding: 10px;
+        ///            display: inline-block;
+        ///            border: 1px solid #aaaaaa;
+        ///            background: white;
+        ///        }
+        ///
+        ///        #drag {
+        ///            width: 200px;
+        ///            height: 50px;
+        ///            padding: 10px;
+        ///            border: 1px solid #aaaaaa;
+        ///            ba [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string DragDropCursorsTest {
+            get {
+                return ResourceManager.GetString("DragDropCursorsTest", resourceCulture);
             }
         }
         
@@ -693,8 +720,8 @@ namespace CefSharp.Example.Properties {
         ///    &lt;head&gt;
         ///        &lt;title&gt;Tooltip Test&lt;/title&gt;
         ///    &lt;/head&gt;
-        ///    &lt;body style=&quot;width:500px;&quot;&gt;
-        ///        &lt;form&gt;
+        ///    &lt;body&gt;
+        ///        &lt;div style=&quot;width:500px;&quot;&gt;
         ///            &lt;input type=&quot;text&quot; size=25 title=&quot;This is the first tooltip&quot;&gt;
         ///            &lt;br /&gt;
         ///            &lt;input type=&quot;text&quot; size=25 title=&quot;This is the second tooltip&quot;&gt;
@@ -702,7 +729,7 @@ namespace CefSharp.Example.Properties {
         ///            &lt;div&gt;
         ///                &lt;select style=&quot;float: left;&quot;&gt;
         ///                    &lt;option selected&gt;test&lt;/option&gt;
-        ///                     [rest of string was truncated]&quot;;.
+        ///                    &lt; [rest of string was truncated]&quot;;.
         /// </summary>
         public static string TooltipTest {
             get {
