@@ -107,7 +107,10 @@ namespace CefSharp.Wpf
         /// we can reuse the drag data provided from CEF
         /// </summary>
         private IDragData currentDragData;
-
+        /// <summary>
+        /// Keep the current drag&drop effects to return the appropriate effects on drag over.
+        /// </summary>
+        private DragDropEffects currentDragDropEffects;
         /// <summary>
         /// A flag that indicates whether or not the designer is active
         /// NOTE: Needs to be static for OnApplicationExit
@@ -755,14 +758,14 @@ namespace CefSharp.Wpf
         {
             UpdateDragCursor(operation);
         }
-
+        
         /// <summary>
         /// Called when the web view wants to update the mouse cursor during a drag &amp; drop operation.
         /// </summary>
         /// <param name="operation">describes the allowed operation (none, move, copy, link). </param>
         protected virtual void UpdateDragCursor(DragOperationsMask operation)
         {
-            //TODO: Someone should implement this
+            currentDragDropEffects = operation.GetDragEffects();
         }
 
         /// <summary>
@@ -1480,6 +1483,9 @@ namespace CefSharp.Wpf
             {
                 browser.GetHost().DragTargetDragOver(GetMouseEvent(e), GetDragOperationsMask(e.AllowedEffects));
             }
+
+            e.Effects = currentDragDropEffects;
+            e.Handled = true;
         }
 
         /// <summary>
