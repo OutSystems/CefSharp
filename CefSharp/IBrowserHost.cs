@@ -118,7 +118,14 @@ namespace CefSharp
         IntPtr GetWindowHandle();
 
         /// <summary>
-        /// Get the current zoom level. The default zoom level is 0.0. This method can only be called on the CEF UI thread. 
+        /// Gets the current zoom level. The default zoom level is 0.0. This method can only be called on the CEF UI thread. 
+        /// </summary>
+        /// <returns>zoom level (default is 0.0)</returns>
+        double GetZoomLevel();
+
+        /// <summary>
+        /// Get the current zoom level. The default zoom level is 0.0. This method executes GetZoomLevel on the CEF UI thread
+        /// in an async fashion.
         /// </summary>
         /// <returns> a <see cref="Task{Double}"/> that when executed returns the zoom level as a double.</returns>
         Task<double> GetZoomLevelAsync();
@@ -288,6 +295,13 @@ namespace CefSharp
         /// <param name="deltaX">Movement delta for X direction.</param>
         /// <param name="deltaY">movement delta for Y direction.</param>
         void SendMouseWheelEvent(MouseEvent mouseEvent, int deltaX, int deltaY);
+
+        /// <summary>
+        /// Send a touch event to the browser.
+        /// WPF and OffScreen browsers only
+        /// </summary>
+        /// <param name="evt">touch event</param>
+        void SendTouchEvent(TouchEvent evt);
 
         /// <summary>
         /// Set accessibility state for all frames.  If accessibilityState is Default then accessibility will be disabled by default

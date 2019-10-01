@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using CefSharp.Internals;
+using CefSharp.Web;
 
 namespace CefSharp
 {
@@ -258,7 +259,7 @@ namespace CefSharp
         /// you can provide a custom implementation if you require a custom implementation</param>
         public static void ExecuteScriptAsync(this IWebBrowser browser, string methodName, params object[] args)
         {
-            var script = GetScript(methodName, args);
+            var script = GetScriptForJavascriptMethodWithArgs(methodName, args);
 
             browser.ExecuteScriptAsync(script);
         }
@@ -271,11 +272,10 @@ namespace CefSharp
         /// <param name="script">The Javascript code that should be executed.</param>
         public static void ExecuteScriptAsync(this IWebBrowser browser, string script)
         {
-            //TODO: Re-enable when Native IPC issue resolved.
-            //if (browser.CanExecuteJavascriptInMainFrame == false)
-            //{
-            //	ThrowExceptionIfCanExecuteJavascriptInMainFrameFalse();
-            //}
+            if (browser.CanExecuteJavascriptInMainFrame == false)
+            {
+                ThrowExceptionIfCanExecuteJavascriptInMainFrameFalse();
+            }
 
             using (var frame = browser.GetMainFrame())
             {
@@ -364,6 +364,9 @@ namespace CefSharp
 
                 request.Url = url;
                 request.Method = "POST";
+                //Add AllowStoredCredentials as per suggestion linked in
+                //https://github.com/cefsharp/CefSharp/issues/2705#issuecomment-476819788
+                request.Flags = UrlRequestFlags.AllowStoredCredentials;
 
                 request.PostData.AddData(postDataBytes);
 
@@ -424,16 +427,9 @@ namespace CefSharp
         /// <param name="base64Encode">if true the html string will be base64 encoded using UTF8 encoding.</param>
         public static void LoadHtml(this IWebBrowser browser, string html, bool base64Encode = false)
         {
-            if (base64Encode)
-            {
-                var base64EncodedHtml = Convert.ToBase64String(Encoding.UTF8.GetBytes(html));
-                browser.Load("data:text/html;base64," + base64EncodedHtml);
-            }
-            else
-            {
-                var uriEncodedHtml = Uri.EscapeDataString(html);
-                browser.Load("data:text/html," + uriEncodedHtml);
-            }
+            var htmlString = new HtmlString(html, base64Encode);
+
+            browser.Load(htmlString.ToDataUriString());
         }
 
         /// <summary>
@@ -446,16 +442,9 @@ namespace CefSharp
         /// <param name="base64Encode">if true the html string will be base64 encoded using UTF8 encoding.</param>
         public static void LoadHtml(this IFrame frame, string html, bool base64Encode = false)
         {
-            if (base64Encode)
-            {
-                var base64EncodedHtml = Convert.ToBase64String(Encoding.UTF8.GetBytes(html));
-                frame.LoadUrl("data:text/html;base64," + base64EncodedHtml);
-            }
-            else
-            {
-                var uriEncodedHtml = Uri.EscapeDataString(html);
-                frame.LoadUrl("data:text/html," + uriEncodedHtml);
-            }
+            var htmlString = new HtmlString(html, base64Encode);
+
+            frame.LoadUrl(htmlString.ToDataUriString());
         }
 
         /// <summary>
@@ -474,20 +463,19 @@ namespace CefSharp
         /// <returns>returns false if the Url was not successfully parsed into a Uri</returns>
         public static bool LoadHtml(this IWebBrowser browser, string html, string url, Encoding encoding, bool oneTimeUse = false)
         {
-            var handler = browser.ResourceHandlerFactory;
+            if (browser.ResourceRequestHandlerFactory == null)
+            {
+                browser.ResourceRequestHandlerFactory = new ResourceRequestHandlerFactory();
+            }
+
+            var handler = browser.ResourceRequestHandlerFactory as ResourceRequestHandlerFactory;
+
             if (handler == null)
             {
-                throw new Exception("Implement IResourceHandlerFactory and assign to the ResourceHandlerFactory property to use this feature");
+                throw new Exception("LoadHtml can only be used with the default IResourceRequestHandlerFactory(DefaultResourceRequestHandlerFactory) implementation");
             }
 
-            var resourceHandler = handler as DefaultResourceHandlerFactory;
-
-            if (resourceHandler == null)
-            {
-                throw new Exception("LoadHtml can only be used with the default IResourceHandlerFactory(DefaultResourceHandlerFactory) implementation");
-            }
-
-            if (resourceHandler.RegisterHandler(url, ResourceHandler.GetByteArray(html, encoding, true), ResourceHandler.DefaultMimeType, oneTimeUse))
+            if (handler.RegisterHandler(url, ResourceHandler.GetByteArray(html, encoding, true), ResourceHandler.DefaultMimeType, oneTimeUse))
             {
                 browser.Load(url);
                 return true;
@@ -507,10 +495,16 @@ namespace CefSharp
         public static void RegisterResourceHandler(this IWebBrowser browser, string url, Stream stream, string mimeType = ResourceHandler.DefaultMimeType,
             bool oneTimeUse = false)
         {
-            var handler = browser.ResourceHandlerFactory as DefaultResourceHandlerFactory;
+            if (browser.ResourceRequestHandlerFactory == null)
+            {
+                browser.ResourceRequestHandlerFactory = new ResourceRequestHandlerFactory();
+            }
+
+            var handler = browser.ResourceRequestHandlerFactory as ResourceRequestHandlerFactory;
+
             if (handler == null)
             {
-                throw new Exception("RegisterResourceHandler can only be used with the default IResourceHandlerFactory(DefaultResourceHandlerFactory) implementation");
+                throw new Exception("RegisterResourceHandler can only be used with the default IResourceRequestHandlerFactory(DefaultResourceRequestHandlerFactory) implementation");
             }
 
             using (var ms = new MemoryStream())
@@ -528,10 +522,11 @@ namespace CefSharp
         /// <param name="url">the url of the resource to unregister</param>
         public static void UnRegisterResourceHandler(this IWebBrowser browser, string url)
         {
-            var handler = browser.ResourceHandlerFactory as DefaultResourceHandlerFactory;
+            var handler = browser.ResourceRequestHandlerFactory as ResourceRequestHandlerFactory;
+
             if (handler == null)
             {
-                throw new Exception("UnRegisterResourceHandler can only be used with the default IResourceHandlerFactory(DefaultResourceHandlerFactory) implementation");
+                throw new Exception("UnRegisterResourceHandler can only be used with the default IResourceRequestHandlerFactory(DefaultResourceRequestHandlerFactory) implementation");
             }
 
             handler.UnregisterHandler(url);
@@ -617,7 +612,7 @@ namespace CefSharp
                 throw new Exception("RequestContext is null, unable to obtain cookie manager");
             }
 
-            return requestContext.GetDefaultCookieManager(callback);
+            return requestContext.GetCookieManager(callback);
         }
 
         /// <summary>
@@ -955,11 +950,10 @@ namespace CefSharp
                 throw new ArgumentOutOfRangeException("timeout", "Timeout greater than Maximum allowable value of " + UInt32.MaxValue);
             }
 
-            //TODO: Re-enable when Native IPC issue resolved.
-            //if(browser.CanExecuteJavascriptInMainFrame == false)
-            //{
-            //	ThrowExceptionIfCanExecuteJavascriptInMainFrameFalse();
-            //}
+            if (browser.CanExecuteJavascriptInMainFrame == false)
+            {
+                ThrowExceptionIfCanExecuteJavascriptInMainFrameFalse();
+            }
 
             using (var frame = browser.GetMainFrame())
             {
@@ -996,7 +990,7 @@ namespace CefSharp
         /// <returns><see cref="Task{JavascriptResponse}"/> that can be awaited to perform the script execution</returns>
         public static Task<JavascriptResponse> EvaluateScriptAsync(this IWebBrowser browser, TimeSpan? timeout, string methodName, params object[] args)
         {
-            var script = GetScript(methodName, args);
+            var script = GetScriptForJavascriptMethodWithArgs(methodName, args);
 
             return browser.EvaluateScriptAsync(script, timeout);
         }
@@ -1013,7 +1007,7 @@ namespace CefSharp
             if (!browser.IsBrowserInitialized)
             {
                 throw new Exception("Browser is not yet initialized. Use the IsBrowserInitializedChanged event and check " +
-                                    "the IsBrowserInitialized property to determine when the browser has been intialized.");
+                                    "the IsBrowserInitialized property to determine when the browser has been initialized.");
             }
         }
 
@@ -1058,7 +1052,7 @@ namespace CefSharp
         /// <param name="methodName">The javascript method name to execute</param>
         /// <param name="args">the arguments to be passed as params to the method</param>
         /// <returns>The Javascript code</returns>
-        private static string GetScript(string methodName, object[] args)
+        public static string GetScriptForJavascriptMethodWithArgs(string methodName, object[] args)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.Append(methodName);

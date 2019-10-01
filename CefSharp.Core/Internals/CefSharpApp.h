@@ -91,6 +91,7 @@ namespace CefSharp
             {
                 String^ argument = "=";
                 bool hasCustomScheme = false;
+                auto registeredSchemes = gcnew List<String^>();
 
                 for each(CefCustomScheme^ scheme in _cefSettings->CefCustomSchemes)
                 {
@@ -101,15 +102,18 @@ namespace CefSharp
                         continue;
                     }
 
+                    //We've already registered this scheme name
+                    if (registeredSchemes->Contains(scheme->SchemeName))
+                    {
+                        continue;
+                    }
+
                     hasCustomScheme = true;
 
+                    registeredSchemes->Add(scheme->SchemeName);
+
                     argument += scheme->SchemeName + "|";
-                    argument += (scheme->IsStandard ? "T" : "F") + "|";
-                    argument += (scheme->IsLocal ? "T" : "F") + "|";
-                    argument += (scheme->IsDisplayIsolated ? "T" : "F") + "|";
-                    argument += (scheme->IsSecure ? "T" : "F") + "|";
-                    argument += (scheme->IsCorsEnabled ? "T" : "F") + "|";
-                    argument += (scheme->IsCSPBypassing ? "T" : "F") + ";";
+                    argument += ((int)scheme->Options).ToString() + ";";
                 }
 
                 if (hasCustomScheme)
@@ -200,6 +204,6 @@ namespace CefSharp
             extraInfo->SetList(0, extensionList);
         }
 
-        IMPLEMENT_REFCOUNTING(CefSharpApp)
+        IMPLEMENT_REFCOUNTING(CefSharpApp);
     };
 }

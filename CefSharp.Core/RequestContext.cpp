@@ -49,13 +49,13 @@ namespace CefSharp
         return _requestContext->IsSharingWith(requestContext);
     }
 
-    ICookieManager^ RequestContext::GetDefaultCookieManager(ICompletionCallback^ callback)
+    ICookieManager^ RequestContext::GetCookieManager(ICompletionCallback^ callback)
     {
         ThrowIfDisposed();
 
         CefRefPtr<CefCompletionCallback> wrapper = callback == nullptr ? NULL : new CefCompletionCallbackAdapter(callback);
 
-        auto cookieManager = _requestContext->GetDefaultCookieManager(wrapper);
+        auto cookieManager = _requestContext->GetCookieManager(wrapper);
         if (cookieManager.get())
         {
             return gcnew CookieManager(cookieManager);
@@ -165,19 +165,6 @@ namespace CefSharp
         _requestContext->ResolveHost(StringUtils::ToNative(origin->AbsoluteUri), callbackWrapper);
 
         return callback->Task;
-    }
-
-    CefErrorCode RequestContext::ResolveHostCached(Uri^ origin, [Out] IList<String^>^ %resolvedIpAddresses)
-    {
-        ThrowIfDisposed();
-
-        std::vector<CefString> addresses;
-
-        auto errorCode = _requestContext->ResolveHostCached(StringUtils::ToNative(origin->AbsoluteUri), addresses);
-
-        resolvedIpAddresses = StringUtils::ToClr(addresses);
-
-        return (CefErrorCode)errorCode;
     }
 
     bool RequestContext::DidLoadExtension(String^ extensionId)
