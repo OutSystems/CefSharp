@@ -125,8 +125,9 @@ namespace CefSharp
 
         bool IResourceHandler.Skip(long bytesToSkip, out long bytesSkipped, IResourceSkipCallback callback)
         {
+            var stream = Stream;
             //No Stream or Stream cannot seek then we indicate failure
-            if (Stream == null || !Stream.CanSeek)
+            if (stream == null || !stream.CanSeek)
             {
                 //Indicate failure
                 bytesSkipped = -2;
@@ -136,7 +137,7 @@ namespace CefSharp
 
             bytesSkipped = bytesToSkip;
 
-            Stream.Seek(bytesToSkip, SeekOrigin.Current);
+            stream.Seek(bytesToSkip, SeekOrigin.Current);
 
             return false;
         }
@@ -148,14 +149,15 @@ namespace CefSharp
             //We don't need the callback, as it's an unmanaged resource we should dispose it (could wrap it in a using statement).
             callback.Dispose();
 
-            if (Stream == null)
+            var stream = Stream;
+            if (stream == null)
             {
                 return false;
             }
 
             //Data out represents an underlying buffer (typically 32kb in size).
             var buffer = new byte[dataOut.Length];
-            bytesRead = Stream.Read(buffer, 0, buffer.Length);
+            bytesRead = stream.Read(buffer, 0, buffer.Length);
 
             // To indicate response completion set bytesRead to 0 and return false
             if (bytesRead == 0)
@@ -182,16 +184,19 @@ namespace CefSharp
             {
                 response.Charset = Charset;
             }
-
+            
             if (ResponseLength.HasValue)
             {
                 responseLength = ResponseLength.Value;
+                return;
             }
-            else if (Stream != null && Stream.CanSeek)
+
+            var stream = Stream;
+            if (stream != null && stream.CanSeek)
             {
                 //If no ResponseLength provided then attempt to infer the length
-                responseLength = Stream.Length;
-            };
+                responseLength = stream.Length;
+            }
         }
 
         void IResourceHandler.Cancel()
@@ -959,9 +964,10 @@ namespace CefSharp
         /// </summary>
         public virtual void Dispose()
         {
-            if (AutoDisposeStream && Stream != null)
+            var stream = Stream;
+            if (AutoDisposeStream && stream != null)
             {
-                Stream.Dispose();
+                stream.Dispose();
                 Stream = null;
             }
         }
